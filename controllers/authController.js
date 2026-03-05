@@ -2,8 +2,10 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+
 // ================= REGISTER =================
 exports.register = async (req, res) => {
+
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -11,25 +13,54 @@ exports.register = async (req, res) => {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const sql = "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)";
+    // Check if email already exists
+    const checkSql = "SELECT * FROM users WHERE email = ?";
 
-    db.query(sql, [name, email, hashedPassword], (err, result) => {
+    db.query(checkSql, [email], async (err, results) => {
+
       if (err) {
+        return res.status(500).json({ message: "Database error" });
+      }
+
+      if (results.length > 0) {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      res.status(201).json({ message: "User registered successfully" });
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const insertSql =
+        "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)";
+
+      db.query(insertSql, [name, email, hashedPassword], (err, result) => {
+
+        if (err) {
+          return res.status(500).json({ message: "Registration failed" });
+        }
+
+        res.status(201).json({
+          message: "User registered successfully"
+        });
+
+      });
+
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
   }
+
 };
+
 
 // ================= LOGIN =================
 exports.login = (req, res) => {
+
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -39,7 +70,12 @@ exports.login = (req, res) => {
   const sql = "SELECT * FROM users WHERE email = ?";
 
   db.query(sql, [email], async (err, results) => {
-    if (err || results.length === 0) {
+
+    if (err) {
+      return res.status(500).json({ message: "Database error" });
+    }
+
+    if (results.length === 0) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
@@ -59,18 +95,23 @@ exports.login = (req, res) => {
 
     res.json({
       message: "Login successful",
-      token,
+      token
     });
+
   });
+
 };
+
 
 // ================= UPGRADE TO PRO =================
 exports.upgradeToPro = (req, res) => {
+
   const userId = req.user.id;
 
   const sql = "UPDATE users SET plan_type = 'pro' WHERE id = ?";
 
   db.query(sql, [userId], (err, result) => {
+
     if (err) {
       return res.status(500).json({ message: "Upgrade failed" });
     }
@@ -85,5 +126,7 @@ exports.upgradeToPro = (req, res) => {
       message: "Upgraded to Pro successfully",
       token: newToken
     });
+
   });
+
 };

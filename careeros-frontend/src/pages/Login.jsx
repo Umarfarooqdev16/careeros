@@ -1,77 +1,83 @@
 import { useState } from "react";
 import api from "../api/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
 
-const [email,setEmail] = useState("");
-const [password,setPassword] = useState("");
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const handleLogin = async (e) => {
+  const handleLogin = async (e) => {
 
-e.preventDefault();
+    e.preventDefault();
 
-try{
+    try{
 
-const res = await api.post("/auth/login",{email,password});
+      const res = await api.post("/auth/login",{email,password});
 
-localStorage.setItem("token",res.data.token);
+      localStorage.setItem("token",res.data.token);
 
-navigate("/dashboard");
+      navigate("/dashboard");
 
-}catch(err){
+    }catch(err){
 
-alert("Invalid credentials");
+      alert("Invalid credentials");
 
-}
+    }
 
-};
+  };
 
-return (
+  return (
 
-<div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
 
-<div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
 
-<h2 className="text-2xl font-bold mb-6 text-center">
-Login
-</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Login
+        </h2>
 
-<form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin}>
 
-<input
-type="email"
-placeholder="Email"
-className="border p-3 w-full mb-4 rounded"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-/>
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-3 w-full mb-4 rounded"
+            value={email}
+            onChange={(e)=>setEmail(e.target.value)}
+          />
 
-<input
-type="password"
-placeholder="Password"
-className="border p-3 w-full mb-6 rounded"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-/>
+          <input
+            type="password"
+            placeholder="Password"
+            className="border p-3 w-full mb-6 rounded"
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+          />
 
-<button
-type="submit"
-className="bg-blue-600 text-white w-full py-3 rounded hover:bg-blue-700"
->
-Login
-</button>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white w-full py-3 rounded hover:bg-blue-700"
+          >
+            Login
+          </button>
 
-</form>
+        </form>
 
-</div>
+        <p className="text-center mt-4">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Register
+          </Link>
+        </p>
 
-</div>
+      </div>
 
-);
+    </div>
 
+  );
 }
 
 export default Login;
