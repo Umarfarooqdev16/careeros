@@ -131,30 +131,31 @@ exports.upgradeToPro = (req, res) => {
 
 };
 
-exports.getProfile = (req,res)=>{
+exports.getProfile = (req, res) => {
 
 const userId = req.user.id;
 
-const userSql = "SELECT id,name,email,plan_type FROM users WHERE id = ?";
-
+const userSql = "SELECT id, name, email, plan_type FROM users WHERE id = ?";
 const goalSql = "SELECT * FROM goals WHERE user_id = ?";
 
-db.query(userSql,[userId],(err,userResult)=>{
+db.query(userSql, [userId], (err, userResult) => {
 
-if(err) return res.status(500).json({message:"Error fetching user"});
+  if (err) {
+    return res.status(500).json({ message: "Error fetching user" });
+  }
 
-db.query(goalSql,[userId],(err,goalResult)=>{
+  db.query(goalSql, [userId], (err, goalResult) => {
 
-if(err) return res.status(500).json({message:"Error fetching goals"});
+    if (err) {
+      return res.status(500).json({ message: "Error fetching goals" });
+    }
 
-res.json({
+    res.json({
+      user: userResult[0],
+      goals: goalResult
+    });
 
-user:userResult[0],
-goals:goalResult
-
-});
-
-});
+  });
 
 });
 
