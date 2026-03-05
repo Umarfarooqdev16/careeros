@@ -1,93 +1,102 @@
 import { useState } from "react";
+import api from "../api/axios";
 
-function GoalCard({ goal, updateProgress, deleteGoal }) {
+function GoalCard({ goal, updateProgress, deleteGoal, fetchGoals }) {
 
-const [subtasks,setSubtasks] = useState(goal.subtasks || []);
-const [newTask,setNewTask] = useState("");
+const [editMode,setEditMode] = useState(false);
 
-/* STATUS */
+const [title,setTitle] = useState(goal.title);
+const [description,setDescription] = useState(goal.description);
+const [deadline,setDeadline] = useState(goal.deadline || "");
 
-const getStatus = () => {
+const handleUpdate = async () => {
 
-if(goal.progress === 100) return "Completed";
+try{
 
-if(goal.deadline){
-
-const today = new Date();
-const due = new Date(goal.deadline);
-
-if(today > due) return "Overdue";
-
-}
-
-return "In Progress";
-
-};
-
-/* DAYS REMAINING */
-
-const getDaysRemaining = () => {
-
-if(!goal.deadline) return null;
-
-const today = new Date();
-const due = new Date(goal.deadline);
-
-return Math.ceil((due - today)/(1000*60*60*24));
-
-};
-
-/* ADD SUBTASK */
-
-const addSubtask = () => {
-
-if(!newTask) return;
-
-setSubtasks([...subtasks,{text:newTask,done:false}]);
-
-setNewTask("");
-
-};
-
-/* TOGGLE SUBTASK */
-
-const toggleSubtask = (index) => {
-
-const updated = [...subtasks];
-
-updated[index].done = !updated[index].done;
-
-setSubtasks(updated);
-
-};
-
-/* SHARE GOAL */
-
-const shareGoal = () => {
-
-if(navigator.share){
-
-navigator.share({
-title:goal.title,
-text:goal.description
+await api.put(`/goals/${goal._id}`,{
+title,
+description,
+deadline
 });
 
-}else{
+setEditMode(false);
+fetchGoals();
 
-alert("Sharing not supported in this browser");
-
+}catch(err){
+alert("Failed to update goal");
 }
 
 };
 
-const days = getDaysRemaining();
-const status = getStatus();
+const handleDelete = () => {
 
-return (
+const confirmDelete = window.confirm(
+"Are you sure you want to delete this goal?"
+);
 
-<div className="bg-white p-6 rounded-xl shadow-md">
+if(confirmDelete){
+deleteGoal(goal._id);
+}
 
-{/* HEADER */}
+};
+
+const status = goal.progress === 100 ? "Completed" : "In Progress";
+
+return(
+
+<div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition duration-300">
+
+{/* EDIT MODE */}
+
+{editMode ? (
+
+<div>
+
+<input
+type="text"
+className="border p-2 w-full mb-3 rounded"
+value={title}
+onChange={(e)=>setTitle(e.target.value)}
+/>
+
+<textarea
+className="border p-2 w-full mb-3 rounded"
+value={description}
+onChange={(e)=>setDescription(e.target.value)}
+/>
+
+<input
+type="date"
+className="border p-2 w-full mb-4 rounded"
+value={deadline}
+onChange={(e)=>setDeadline(e.target.value)}
+/>
+
+<div className="flex gap-2">
+
+<button
+onClick={handleUpdate}
+className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded"
+>
+Save
+</button>
+
+<button
+onClick={()=>setEditMode(false)}
+className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1 rounded"
+>
+Cancel
+</button>
+
+</div>
+
+</div>
+
+) : (
+
+<div>
+
+{/* TITLE + STATUS */}
 
 <div className="flex justify-between items-center mb-2">
 
@@ -96,15 +105,14 @@ return (
 </h3>
 
 <span
-className={`text-xs px-2 py-1 rounded 
-${status==="Completed"?"bg-green-500":
-status==="Overdue"?"bg-red-500":"bg-yellow-500"}
-text-white`}
+className={`text-xs px-2 py-1 rounded text-white
+${status==="Completed" ? "bg-green-500" : "bg-yellow-500"}`}
 >
 {status}
 </span>
 
 </div>
+
 
 {/* DESCRIPTION */}
 
@@ -112,127 +120,71 @@ text-white`}
 {goal.description}
 </p>
 
+
 {/* DEADLINE */}
 
 {goal.deadline && (
 
 <p className="text-sm text-gray-500 mb-2">
-
 Deadline: {new Date(goal.deadline).toLocaleDateString()}
-
 </p>
 
 )}
 
-{/* COUNTDOWN */}
-
-{days !== null && (
-
-<p className="text-sm mb-3">
-
-{days < 0
-? "⚠ Deadline passed"
-: `⏳ ${days} days remaining`}
-
-</p>
-
-)}
 
 {/* PROGRESS BAR */}
 
-<div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+<div className="w-full bg-gray-200 rounded-full h-3 mb-2 overflow-hidden">
 
 <div
-className="bg-blue-600 h-2 rounded-full"
+className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500"
 style={{ width: `${goal.progress || 0}%` }}
 ></div>
 
 </div>
 
-<p className="text-sm mb-3">
+<p className="text-sm mb-4">
 Progress: {goal.progress || 0}%
 </p>
 
+
 {/* BUTTONS */}
 
-<div className="flex flex-wrap gap-2 mb-4">
+<div className="flex flex-wrap gap-2">
 
 <button
-className="bg-green-500 text-white px-3 py-1 rounded text-sm"
-onClick={()=>updateProgress(goal.id,(goal.progress||0)+10)}
+className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
+onClick={()=>updateProgress(goal._id,(goal.progress||0)+10)}
 >
 +10%
 </button>
 
 <button
-className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
-onClick={()=>updateProgress(goal.id,(goal.progress||0)-10)}
+className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
+onClick={()=>updateProgress(goal._id,(goal.progress||0)-10)}
 >
 -10%
 </button>
 
 <button
-className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-onClick={shareGoal}
+className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+onClick={()=>setEditMode(true)}
 >
-Share
+Edit
 </button>
 
 <button
-onClick={()=>deleteGoal(goal.id)}
-className="text-red-500 text-sm"
+className="text-red-500 text-sm hover:underline"
+onClick={handleDelete}
 >
 Delete
 </button>
 
 </div>
 
-{/* SUBTASKS */}
-
-<div>
-
-<h4 className="font-semibold text-sm mb-2">
-Subtasks
-</h4>
-
-{subtasks.map((task,index)=>(
-
-<div key={index} className="flex items-center gap-2 text-sm mb-1">
-
-<input
-type="checkbox"
-checked={task.done}
-onChange={()=>toggleSubtask(index)}
-/>
-
-<span className={task.done ? "line-through":""}>
-{task.text}
-</span>
-
 </div>
 
-))}
-
-<div className="flex flex-col sm:flex-row mt-2 gap-2">
-
-<input
-type="text"
-placeholder="New subtask"
-className="border p-2 text-sm flex-1 rounded"
-value={newTask}
-onChange={(e)=>setNewTask(e.target.value)}
-/>
-
-<button
-onClick={addSubtask}
-className="bg-blue-500 text-white px-3 py-2 text-sm rounded"
->
-Add
-</button>
-
-</div>
-
-</div>
+)}
 
 </div>
 

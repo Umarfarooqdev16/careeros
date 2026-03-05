@@ -18,36 +18,33 @@ const [search,setSearch] = useState("");
 const [filter,setFilter] = useState("all");
 const [streak,setStreak] = useState(0);
 
+const [badges,setBadges] = useState([]);
+const [showBadge,setShowBadge] = useState(null);
 
-// FETCH GOALS
+
+/* FETCH GOALS */
 
 const fetchGoals = async () => {
+
   try{
+
     const res = await api.get("/goals");
     setGoals(Array.isArray(res.data) ? res.data : []);
+
   }catch(err){
+
     console.error(err);
+
   }
+
 };
 
 useEffect(()=>{
-  fetchGoals();
+fetchGoals();
 },[]);
 
 
-
-// ACTIVITY LOG
-
-const logActivity = (text) => {
-setActivity(prev => [
-  { message:text , time:new Date() },
-  ...prev
-]);
-};
-
-
-
-// PRODUCTIVITY STREAK
+/* BADGE + STREAK LOGIC */
 
 useEffect(()=>{
 
@@ -55,11 +52,45 @@ let completed = goals.filter(g => (g.progress || 0) === 100);
 
 setStreak(completed.length);
 
+let newBadges = [];
+
+if(completed.length >= 1 && !badges.includes("first")){
+newBadges.push("first");
+setShowBadge("🏆 First Goal Completed");
+}
+
+if(completed.length >= 5 && !badges.includes("five")){
+newBadges.push("five");
+setShowBadge("🔥 5 Goals Completed");
+}
+
+if(completed.length >= 10 && !badges.includes("ten")){
+newBadges.push("ten");
+setShowBadge("🎯 10 Goals Completed");
+}
+
+if(newBadges.length > 0){
+setBadges(prev => [...prev,...newBadges]);
+}
+
 },[goals]);
 
 
+/* ACTIVITY LOG */
 
-// SEARCH + FILTER
+const logActivity = (text) => {
+
+setActivity(prev => [
+
+{message:text,time:new Date()},
+...prev
+
+]);
+
+};
+
+
+/* SEARCH + FILTER */
 
 let filteredGoals = goals.filter(goal => {
 
@@ -75,13 +106,11 @@ return true;
 
 });
 
-
 const activeGoals = filteredGoals.filter(g => (g.progress || 0) < 100);
 const completedGoals = filteredGoals.filter(g => (g.progress || 0) === 100);
 
 
-
-// UPDATE PROGRESS
+/* UPDATE PROGRESS */
 
 const updateProgress = async(id,progress)=>{
 
@@ -90,45 +119,70 @@ const safe = Math.max(0,Math.min(100,progress));
 try{
 
 await api.put(`/goals/${id}`,{progress:safe});
-
 fetchGoals();
 
 }catch(err){
+
 console.error(err);
+
 }
 
 };
 
 
-
-// DELETE GOAL
+/* DELETE GOAL */
 
 const deleteGoal = async(id)=>{
 
 try{
 
 await api.delete(`/goals/${id}`);
-
 logActivity("Goal deleted");
-
 fetchGoals();
 
 }catch(err){
+
 console.error(err);
+
 }
 
 };
-
 
 
 return(
 
 <Layout>
 
-<h1 className="text-3xl font-bold mb-6">
+{/* BADGE POPUP */}
+
+{showBadge && (
+
+<div className="bg-green-500 text-white p-4 rounded mb-4 shadow flex justify-between items-center">
+
+<span>🎉 Badge Unlocked! {showBadge}</span>
+
+<button
+className="text-sm underline"
+onClick={()=>setShowBadge(null)}
+>
+Dismiss
+</button>
+
+</div>
+
+)}
+
+<div className="flex items-center justify-between mb-6">
+
+<h1 className="text-3xl font-bold">
 Dashboard
 </h1>
 
+<p className="text-gray-500 text-sm">
+Track your career progress 🚀
+</p>
+
+</div>
 
 
 {/* PRODUCTIVITY STREAK */}
@@ -138,11 +192,9 @@ Dashboard
 </div>
 
 
-
 {/* ANALYTICS */}
 
 <GoalAnalytics goals={goals} />
-
 
 
 {/* SEARCH + FILTER */}
@@ -172,17 +224,14 @@ onChange={(e)=>setFilter(e.target.value)}
 </div>
 
 
-
 {/* CREATE GOAL */}
 
 <GoalForm fetchGoals={fetchGoals} logActivity={logActivity} />
 
 
-
 {/* EXPORT */}
 
 <GoalExport goals={goals} />
-
 
 
 {/* ACTIVE GOALS */}
@@ -196,8 +245,8 @@ goals={activeGoals}
 setGoals={setGoals}
 updateProgress={updateProgress}
 deleteGoal={deleteGoal}
+fetchGoals={fetchGoals}
 />
-
 
 
 {/* COMPLETED GOALS */}
@@ -215,6 +264,7 @@ key={goal._id}
 goal={goal}
 updateProgress={updateProgress}
 deleteGoal={deleteGoal}
+fetchGoals={fetchGoals}
 />
 
 ))}
@@ -222,11 +272,9 @@ deleteGoal={deleteGoal}
 </div>
 
 
-
 {/* CALENDAR */}
 
 <GoalCalendar goals={goals} />
-
 
 
 {/* ACTIVITY LOG */}

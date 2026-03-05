@@ -6,10 +6,14 @@ function GoalForm({ fetchGoals, logActivity }) {
 const [title,setTitle] = useState("");
 const [description,setDescription] = useState("");
 const [deadline,setDeadline] = useState("");
+const [loading,setLoading] = useState(false);
+const [message,setMessage] = useState("");
 
 const createGoal = async () => {
 
 if(!title || !description) return;
+
+setLoading(true);
 
 try{
 
@@ -24,13 +28,20 @@ setTitle("");
 setDescription("");
 setDeadline("");
 
-fetchGoals();
+setMessage("✅ Goal created successfully!");
 
+fetchGoals();
 logActivity("New goal created");
 
+setTimeout(()=>setMessage(""),3000);
+
 }catch(err){
-console.error(err);
+
+setMessage("❌ Failed to create goal");
+
 }
+
+setLoading(false);
 
 };
 
@@ -66,10 +77,17 @@ onChange={(e)=>setDeadline(e.target.value)}
 
 <button
 onClick={createGoal}
-className="bg-blue-600 text-white px-5 py-2 rounded"
+disabled={loading}
+className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
 >
-Add Goal
+{loading ? "Creating..." : "Add Goal"}
 </button>
+
+{message && (
+<p className="mt-3 text-sm font-medium text-green-600">
+{message}
+</p>
+)}
 
 </div>
 

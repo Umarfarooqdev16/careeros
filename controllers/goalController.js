@@ -68,7 +68,7 @@ exports.deleteGoal = (req, res) => {
   });
 };
 
-// Update Goal Progress
+
 // Update Goal Progress
 exports.updateGoal = (req, res) => {
 
@@ -90,5 +90,30 @@ exports.updateGoal = (req, res) => {
     res.json({ message: "Goal updated successfully" });
 
   });
+
+};
+
+exports.updateGoal = (req, res) => {
+
+const goalId = req.params.id;
+const userId = req.user.id;
+
+const { title, description, deadline } = req.body;
+
+const sql = `
+UPDATE goals 
+SET title = ?, description = ?, deadline = ?
+WHERE id = ? AND user_id = ?
+`;
+
+db.query(sql, [title, description, deadline, goalId, userId], (err,result)=>{
+
+if(err){
+return res.status(500).json({message:"Error updating goal"});
+}
+
+res.json({message:"Goal updated successfully"});
+
+});
 
 };
