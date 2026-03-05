@@ -6,6 +6,9 @@ function Layout({ children }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
 
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,7 +55,50 @@ function Layout({ children }) {
 
         <div className="flex items-center gap-3">
 
-          {/* DARK MODE TOGGLE */}
+          {/* NOTIFICATION BELL */}
+
+          <div className="relative">
+
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="bg-gray-700 px-3 py-2 rounded hover:bg-gray-600"
+            >
+              🔔
+            </button>
+
+            {showNotifications && (
+
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3">
+
+                <p className="font-semibold mb-2">
+                  Notifications
+                </p>
+
+                {notifications.length === 0 ? (
+
+                  <p className="text-sm text-gray-500">
+                    No notifications
+                  </p>
+
+                ) : (
+
+                  notifications.map((n, i) => (
+
+                    <p key={i} className="text-sm mb-1">
+                      {n.message}
+                    </p>
+
+                  ))
+
+                )}
+
+              </div>
+
+            )}
+
+          </div>
+
+          {/* DARK MODE */}
 
           <button
             onClick={() => setDark(!dark)}
@@ -100,9 +146,12 @@ function Layout({ children }) {
               Analytics
             </Link>
 
-            <Link to="/profile" className="block hover:text-blue-300">
-Profile
-</Link>
+            <Link
+              to="/profile"
+              className="block hover:text-blue-300"
+            >
+              Profile
+            </Link>
 
           </nav>
 

@@ -20,6 +20,7 @@ const [streak,setStreak] = useState(0);
 
 const [badges,setBadges] = useState([]);
 const [showBadge,setShowBadge] = useState(null);
+const [notifications, setNotifications] = useState([]);
 
 
 /* FETCH GOALS */
@@ -42,6 +43,17 @@ const fetchGoals = async () => {
 useEffect(()=>{
 fetchGoals();
 },[]);
+
+const addNotification = (message) => {
+
+setNotifications(prev => [
+
+{ message, time: new Date() },
+...prev
+
+]);
+
+};
 
 
 /* BADGE + STREAK LOGIC */
@@ -119,6 +131,11 @@ const safe = Math.max(0,Math.min(100,progress));
 try{
 
 await api.put(`/goals/${id}`,{progress:safe});
+
+if(safe === 100){
+addNotification("🎉 Goal completed!");
+}
+
 fetchGoals();
 
 }catch(err){
@@ -138,6 +155,7 @@ try{
 
 await api.delete(`/goals/${id}`);
 logActivity("Goal deleted");
+addNotification("🗑 Goal deleted");
 fetchGoals();
 
 }catch(err){
