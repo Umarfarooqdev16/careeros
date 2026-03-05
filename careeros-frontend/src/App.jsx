@@ -7,31 +7,27 @@ import Analytics from "./pages/Analytics";
 import Profile from "./pages/Profile";
 
 function ProtectedRoute({ children }) {
-
   const token = localStorage.getItem("token");
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" />;
   }
 
   return children;
-
 }
 
 function App() {
-
   return (
-
     <Routes>
 
-      {/* Default route */}
+      {/* Default Route */}
       <Route path="/" element={<Navigate to="/login" />} />
 
-      {/* Public routes */}
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected routes */}
+      {/* Protected Routes */}
       <Route
         path="/dashboard"
         element={
@@ -51,18 +47,16 @@ function App() {
       />
 
       <Route
-path="/profile"
-element={
-<ProtectedRoute>
-<Profile/>
-</ProtectedRoute>
-}
-/>
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
-
   );
-
 }
 
 export default App;
