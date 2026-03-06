@@ -22,11 +22,38 @@ const [badges,setBadges] = useState([]);
 const [showBadge,setShowBadge] = useState(null);
 const [notifications, setNotifications] = useState([]);
 
+/* NEW STATE FOR PLAN USAGE */
+const [usage,setUsage] = useState({
+used:0,
+limit:5
+});
+
 const fetchGoals = async () => {
 
   try{
+
     const res = await api.get("/goals");
-    setGoals(Array.isArray(res.data) ? res.data : []);
+
+    /* SUPPORT BOTH OLD + NEW BACKEND RESPONSE */
+    if(Array.isArray(res.data)){
+      setGoals(res.data);
+
+      setUsage({
+        used: res.data.length,
+        limit: 5
+      });
+
+    }else{
+
+      setGoals(res.data.goals || []);
+
+      setUsage({
+        used: (res.data.goals || []).length,
+        limit: res.data.limit || 5
+      });
+
+    }
+
   }catch(err){
     console.error(err);
   }
@@ -148,6 +175,19 @@ return(
 <Layout>
 
 <div className="px-4 md:px-6">
+
+{/* FREE PLAN USAGE INDICATOR */}
+<div className="bg-blue-100 border border-blue-300 p-3 md:p-4 rounded mb-6 text-sm md:text-base font-semibold flex justify-between">
+
+<span>
+Free Plan Usage: {usage.used} / {usage.limit} Goals
+</span>
+
+<span className="text-blue-700">
+{usage.limit - usage.used} remaining
+</span>
+
+</div>
 
 {showBadge && (
 

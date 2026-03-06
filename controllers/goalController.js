@@ -43,9 +43,9 @@ exports.createGoal = (req, res) => {
 
       const goalCount = results[0].count;
 
-      /* STEP 3: FREE PLAN LIMIT */
+      /* STEP 3: FREE PLAN LIMIT (UPDATED TO 5) */
 
-      if (userPlan === "free" && goalCount >= 3) {
+      if (userPlan === "free" && goalCount >= 5) {
         return res.status(403).json({
           message: "Free plan limit reached. Upgrade to Pro for unlimited goals."
         });
@@ -104,7 +104,10 @@ exports.getGoals = (req, res) => {
       _id: goal.id
     }));
 
-    res.json(goals);
+    res.json({
+      goals: goals,
+      limit: 5
+    });
 
   });
 
