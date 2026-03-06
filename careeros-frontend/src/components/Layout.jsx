@@ -1,15 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Layout({ children }) {
-
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const [notifications] = useState([]);
-
+  const notifications = [];
   const navigate = useNavigate();
+  const notifRef = useRef(null);
 
   useEffect(() => {
     if (dark) {
@@ -19,20 +18,30 @@ function Layout({ children }) {
     }
   }, [dark]);
 
+  // Close notification dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
   return (
-
     <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 dark:bg-gray-900 flex flex-col">
 
       {/* HEADER */}
-      <header className="bg-slate-900 text-white flex items-center justify-between px-4 py-3">
+      <header className="bg-slate-900 text-white flex items-center justify-between px-4 py-3 relative z-50">
 
         <div className="flex items-center gap-3">
-
           <button
             className="md:hidden bg-blue-600 px-3 py-2 rounded"
             onClick={() => setOpen(!open)}
@@ -40,30 +49,25 @@ function Layout({ children }) {
             ☰
           </button>
 
-          <h1 className="text-lg font-bold">
-            CareerOS 🚀
-          </h1>
-
+          <h1 className="text-lg font-bold">CareerOS 🚀</h1>
         </div>
 
         <div className="flex items-center gap-2">
 
-          {/* NOTIFICATIONS */}
-          <div className="relative">
+          {/* NOTIFICATION */}
+          <div className="relative" ref={notifRef}>
 
             <button
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={() => setShowNotifications(prev => !prev)}
               className="bg-gray-700 px-3 py-2 rounded hover:bg-gray-600"
             >
               🔔
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3 z-50">
+              <div className="absolute right-0 top-12 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3 z-50">
 
-                <p className="font-semibold mb-2">
-                  Notifications
-                </p>
+                <p className="font-semibold mb-2">Notifications</p>
 
                 {notifications.length === 0 ? (
                   <p className="text-sm text-gray-500">
@@ -111,9 +115,7 @@ function Layout({ children }) {
           className={`bg-slate-900 text-white w-64 p-5 space-y-6 flex-shrink-0
           ${open ? "block" : "hidden"} md:block`}
         >
-
           <nav className="space-y-4">
-
             <Link
               to="/dashboard"
               className="block hover:text-blue-300"
@@ -137,25 +139,18 @@ function Layout({ children }) {
             >
               Profile
             </Link>
-
           </nav>
-
         </aside>
-
 
         {/* CONTENT */}
         <main className="flex-1 w-full overflow-x-hidden px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
-
           {children}
-
         </main>
 
       </div>
 
     </div>
-
   );
-
 }
 
 export default Layout;
