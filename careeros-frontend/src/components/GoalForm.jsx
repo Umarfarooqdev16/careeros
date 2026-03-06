@@ -8,12 +8,15 @@ const [description,setDescription] = useState("");
 const [deadline,setDeadline] = useState("");
 const [loading,setLoading] = useState(false);
 const [message,setMessage] = useState("");
+const [error,setError] = useState("");
 
 const createGoal = async () => {
 
 if(!title || !description) return;
 
 setLoading(true);
+setError("");
+setMessage("");
 
 try{
 
@@ -37,7 +40,11 @@ setTimeout(()=>setMessage(""),3000);
 
 }catch(err){
 
-setMessage("❌ Failed to create goal");
+if(err.response && err.response.data.message){
+setError(err.response.data.message);
+}else{
+setError("Failed to create goal");
+}
 
 }
 
@@ -83,9 +90,19 @@ className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
 {loading ? "Creating..." : "Add Goal"}
 </button>
 
+{/* SUCCESS MESSAGE */}
+
 {message && (
 <p className="mt-3 text-sm font-medium text-green-600">
 {message}
+</p>
+)}
+
+{/* ERROR MESSAGE */}
+
+{error && (
+<p className="mt-3 text-sm font-medium text-red-600">
+❌ {error}
 </p>
 )}
 
