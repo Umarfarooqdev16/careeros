@@ -22,21 +22,13 @@ const [badges,setBadges] = useState([]);
 const [showBadge,setShowBadge] = useState(null);
 const [notifications, setNotifications] = useState([]);
 
-
-/* FETCH GOALS */
-
 const fetchGoals = async () => {
 
   try{
-
     const res = await api.get("/goals");
-
     setGoals(Array.isArray(res.data) ? res.data : []);
-
   }catch(err){
-
     console.error(err);
-
   }
 
 };
@@ -44,7 +36,6 @@ const fetchGoals = async () => {
 useEffect(()=>{
 fetchGoals();
 },[]);
-
 
 const addNotification = (message) => {
 
@@ -56,9 +47,6 @@ setNotifications(prev => [
 ]);
 
 };
-
-
-/* BADGE + STREAK LOGIC */
 
 useEffect(()=>{
 
@@ -89,9 +77,6 @@ setBadges(prev => [...prev,...newBadges]);
 
 },[goals]);
 
-
-/* ACTIVITY LOG */
-
 const logActivity = (text) => {
 
 setActivity(prev => [
@@ -102,9 +87,6 @@ setActivity(prev => [
 ]);
 
 };
-
-
-/* SEARCH + FILTER */
 
 let filteredGoals = goals.filter(goal => {
 
@@ -123,9 +105,6 @@ return true;
 const activeGoals = filteredGoals.filter(g => (g.progress || 0) < 100);
 const completedGoals = filteredGoals.filter(g => (g.progress || 0) === 100);
 
-
-/* UPDATE PROGRESS */
-
 const updateProgress = async(id,progress)=>{
 
 const safe = Math.max(0,Math.min(100,progress));
@@ -141,46 +120,34 @@ addNotification("🎉 Goal completed!");
 fetchGoals();
 
 }catch(err){
-
 console.error(err);
-
 }
 
 };
 
-
-/* DELETE GOAL */
-
 const deleteGoal = async (id) => {
 
-  if (!id) {
-    console.error("Delete failed: Goal ID is undefined");
-    return;
-  }
+if (!id) return;
 
-  try {
+try {
 
-    await api.delete(`/goals/${id}`);
+await api.delete(`/goals/${id}`);
+logActivity("Goal deleted");
+addNotification("🗑 Goal deleted");
 
-    logActivity("Goal deleted");
-    addNotification("🗑 Goal deleted");
+fetchGoals();
 
-    fetchGoals();
-
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
+} catch (err) {
+console.error(err);
+}
 
 };
-
 
 return(
 
 <Layout>
 
 <div className="px-4 md:px-6">
-
-{/* BADGE POPUP */}
 
 {showBadge && (
 
@@ -199,12 +166,9 @@ Dismiss
 
 )}
 
-
-{/* HEADER */}
-
 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-2">
 
-<h1 className="text-3xl font-bold">
+<h1 className="text-2xl md:text-3xl font-bold">
 Dashboard
 </h1>
 
@@ -214,22 +178,11 @@ Track your career progress 🚀
 
 </div>
 
-
-{/* PRODUCTIVITY STREAK */}
-
 <div className="bg-orange-100 p-3 md:p-4 rounded mb-6 text-base md:text-lg font-semibold">
-
 🔥 Productivity Streak: {streak} goals completed
-
 </div>
 
-
-{/* ANALYTICS */}
-
 <GoalAnalytics goals={goals} />
-
-
-{/* SEARCH + FILTER */}
 
 <div className="flex flex-col md:flex-row gap-4 mb-6">
 
@@ -255,18 +208,9 @@ onChange={(e)=>setFilter(e.target.value)}
 
 </div>
 
-
-{/* CREATE GOAL */}
-
 <GoalForm fetchGoals={fetchGoals} logActivity={logActivity} />
 
-
-{/* EXPORT */}
-
 <GoalExport goals={goals} />
-
-
-{/* ACTIVE GOALS */}
 
 <h2 className="text-xl font-semibold mt-6 mb-3">
 Active Goals
@@ -279,9 +223,6 @@ updateProgress={updateProgress}
 deleteGoal={deleteGoal}
 fetchGoals={fetchGoals}
 />
-
-
-{/* COMPLETED GOALS */}
 
 <h2 className="text-xl font-semibold mt-10 mb-3">
 Completed Goals
@@ -303,13 +244,7 @@ fetchGoals={fetchGoals}
 
 </div>
 
-
-{/* CALENDAR */}
-
 <GoalCalendar goals={goals} />
-
-
-{/* ACTIVITY LOG */}
 
 <GoalActivityLog activity={activity} />
 

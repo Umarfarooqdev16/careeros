@@ -30,9 +30,6 @@ const inProgress = goals.filter(g => g.progress < 100).length;
 const completionRate =
 totalGoals === 0 ? 0 : Math.round((completed / totalGoals) * 100);
 
-
-/* CHART DATA */
-
 const data = {
 
 labels: ["Completed", "In Progress"],
@@ -58,7 +55,6 @@ backgroundColor: [
 
 };
 
-
 const options = {
 
 responsive: true,
@@ -79,7 +75,6 @@ text: "Goal Progress Overview"
 
 };
 
-
 return (
 
 <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow mb-8">
@@ -88,10 +83,7 @@ return (
 Progress Analytics
 </h2>
 
-
-{/* STAT CARDS */}
-
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 
 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-center">
 <p className="text-sm">Total Goals</p>
@@ -114,9 +106,6 @@ Progress Analytics
 </div>
 
 </div>
-
-
-{/* CHART */}
 
 <div className="w-full h-[250px] md:h-[300px]">
 
