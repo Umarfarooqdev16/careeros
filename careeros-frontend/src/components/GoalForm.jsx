@@ -102,12 +102,31 @@ className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
 </p>
 )}
 
-{/* ERROR MESSAGE */}
+{/* ERROR MESSAGE + UPGRADE BUTTON */}
 
 {error && (
-<p className="mt-3 text-sm font-medium text-red-600">
+
+<div className="mt-3">
+
+<p className="text-sm font-medium text-red-600">
 ❌ {error}
 </p>
+
+{/* SHOW UPGRADE BUTTON ONLY WHEN LIMIT REACHED */}
+
+{error.toLowerCase().includes("limit") && (
+
+<button
+onClick={() => window.location.href="/pricing"}
+className="mt-3 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+>
+🚀 Upgrade to Pro
+</button>
+
+)}
+
+</div>
+
 )}
 
 </div>
