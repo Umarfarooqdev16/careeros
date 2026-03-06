@@ -13,8 +13,6 @@ exports.createGoal = (req, res) => {
     return res.status(400).json({ message: "Title is required" });
   }
 
-  /* GET USER PLAN */
-
   const planSql = "SELECT plan_type FROM users WHERE id = ?";
 
   db.query(planSql, [userId], (err, planResult) => {
@@ -30,9 +28,7 @@ exports.createGoal = (req, res) => {
 
     const userPlan = planResult[0].plan_type || "free";
 
-    /* COUNT USER GOALS */
-
-    const countSql = "SELECT COUNT(*) as count FROM goals WHERE user_id = ?";
+    const countSql = "SELECT COUNT(*) AS count FROM goals WHERE user_id = ?";
 
     db.query(countSql, [userId], (err, results) => {
 
@@ -48,12 +44,10 @@ exports.createGoal = (req, res) => {
       if (userPlan === "free" && goalCount >= 5) {
         return res.status(403).json({
           message: "Free plan limit reached. Upgrade to Pro for unlimited goals.",
-          limit: 5,
-          used: goalCount
+          used: goalCount,
+          limit: 5
         });
       }
-
-      /* CREATE GOAL */
 
       const insertSql =
         "INSERT INTO goals (user_id, title, description, deadline, progress) VALUES (?, ?, ?, ?, 0)";
@@ -92,8 +86,6 @@ exports.getGoals = (req, res) => {
 
   const userId = req.user.id;
 
-  /* GET USER PLAN */
-
   const planSql = "SELECT plan_type FROM users WHERE id = ?";
 
   db.query(planSql, [userId], (err, planResult) => {
@@ -103,7 +95,7 @@ exports.getGoals = (req, res) => {
       return res.status(500).json({ message: "Error fetching plan" });
     }
 
-    const userPlan = planResult[0]?.plan_type || "free";
+    const userPlan = planResult?.[0]?.plan_type || "free";
 
     const sql = "SELECT * FROM goals WHERE user_id = ?";
 
@@ -119,9 +111,13 @@ exports.getGoals = (req, res) => {
         _id: goal.id
       }));
 
+      const used = goals.length;
+      const limit = userPlan === "free" ? 5 : null;
+
       res.json({
         goals,
-        limit: userPlan === "free" ? 5 : "unlimited",
+        used,
+        limit,
         plan: userPlan
       });
 
@@ -192,7 +188,7 @@ exports.updateGoal = (req, res) => {
   db.query(
     sql,
     [title, description, deadline, safeProgress, goalId, userId],
-    (err, result) => {
+    (err) => {
 
       if (err) {
         console.error("Update error:", err);
