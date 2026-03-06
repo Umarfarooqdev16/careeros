@@ -9,9 +9,17 @@ const [title,setTitle] = useState(goal.title);
 const [description,setDescription] = useState(goal.description);
 const [deadline,setDeadline] = useState(goal.deadline || "");
 
+
+/* UPDATE GOAL */
+
 const handleUpdate = async () => {
 
 try{
+
+if(!goal || !goal._id){
+console.error("Update failed: goal ID missing", goal);
+return;
+}
 
 await api.put(`/goals/${goal._id}`,{
 title,
@@ -20,27 +28,41 @@ deadline
 });
 
 setEditMode(false);
+
+if(fetchGoals){
 fetchGoals();
+}
 
 }catch(err){
+console.error(err);
 alert("Failed to update goal");
 }
 
 };
 
+
+/* DELETE GOAL */
+
 const handleDelete = () => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this goal?"
-  );
+const confirmDelete = window.confirm(
+"Are you sure you want to delete this goal?"
+);
 
-  if (confirmDelete) {
-    deleteGoal(goal._id);
-  }
+if(!confirmDelete) return;
+
+if(!goal || !goal._id){
+console.error("Delete failed: goal ID missing", goal);
+return;
+}
+
+deleteGoal(goal._id);
 
 };
 
+
 const status = goal.progress === 100 ? "Completed" : "In Progress";
+
 
 return(
 
