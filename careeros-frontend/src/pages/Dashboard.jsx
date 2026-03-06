@@ -30,6 +30,9 @@ const fetchGoals = async () => {
   try{
 
     const res = await api.get("/goals");
+
+    console.log("Goals from backend:", res.data);   // 👈 ADD THIS LINE
+
     setGoals(Array.isArray(res.data) ? res.data : []);
 
   }catch(err){
@@ -149,20 +152,25 @@ console.error(err);
 
 /* DELETE GOAL */
 
-const deleteGoal = async(id)=>{
+const deleteGoal = async (id) => {
 
-try{
+  if (!id) {
+    console.error("Delete failed: Goal ID is undefined");
+    return;
+  }
 
-await api.delete(`/goals/${id}`);
-logActivity("Goal deleted");
-addNotification("🗑 Goal deleted");
-fetchGoals();
+  try {
 
-}catch(err){
+    await api.delete(`/goals/${id}`);
 
-console.error(err);
+    logActivity("Goal deleted");
+    addNotification("🗑 Goal deleted");
 
-}
+    fetchGoals();
+
+  } catch (err) {
+    console.error("Delete error:", err);
+  }
 
 };
 

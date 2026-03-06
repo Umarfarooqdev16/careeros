@@ -30,13 +30,13 @@ alert("Failed to update goal");
 
 const handleDelete = () => {
 
-const confirmDelete = window.confirm(
-"Are you sure you want to delete this goal?"
-);
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this goal?"
+  );
 
-if(confirmDelete){
-deleteGoal(goal._id);
-}
+  if (confirmDelete) {
+    deleteGoal(goal._id);
+  }
 
 };
 
