@@ -15,7 +15,7 @@ return res.status(400).json({ message: "Title is required" });
 
 /* STEP 1: GET USER PLAN */
 
-const planSql = "SELECT plan FROM users WHERE id = ?";
+const planSql = "SELECT plan_type FROM users WHERE id = ?";
 
 db.query(planSql, [userId], (err, planResult) => {
 
@@ -23,7 +23,7 @@ if (err) {
 return res.status(500).json({ message: "Error fetching user plan" });
 }
 
-const userPlan = planResult[0].plan;
+const userPlan = planResult[0].plan_type;
 
 /* STEP 2: COUNT USER GOALS */
 
