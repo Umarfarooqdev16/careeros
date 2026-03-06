@@ -5,36 +5,30 @@ function Layout({ children }) {
 
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-
-  const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-
     if (dark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-
   }, [dark]);
 
   const handleLogout = () => {
-
     localStorage.removeItem("token");
     navigate("/login");
-
   };
 
   return (
 
-    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition">
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 overflow-x-hidden">
 
       {/* HEADER */}
 
-      <header className="bg-slate-900 dark:bg-gray-950 text-white flex flex-wrap items-center justify-between px-4 py-3 gap-3">
+      <header className="bg-slate-900 text-white flex items-center justify-between px-4 py-3">
 
         <div className="flex items-center gap-3">
 
@@ -51,67 +45,25 @@ function Layout({ children }) {
 
         </div>
 
-        {/* RIGHT SIDE BUTTONS */}
+        <div className="flex items-center gap-2">
 
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-
-          {/* NOTIFICATION */}
-
-          <div className="relative">
-
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="bg-gray-700 px-3 py-2 rounded hover:bg-gray-600"
-            >
-              🔔
-            </button>
-
-            {showNotifications && (
-
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3 z-50">
-
-                <p className="font-semibold mb-2">
-                  Notifications
-                </p>
-
-                {notifications.length === 0 ? (
-
-                  <p className="text-sm text-gray-500">
-                    No notifications
-                  </p>
-
-                ) : (
-
-                  notifications.map((n, i) => (
-
-                    <p key={i} className="text-sm mb-1">
-                      {n.message}
-                    </p>
-
-                  ))
-
-                )}
-
-              </div>
-
-            )}
-
-          </div>
-
-          {/* DARK MODE */}
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="bg-gray-700 px-3 py-2 rounded"
+          >
+            🔔
+          </button>
 
           <button
             onClick={() => setDark(!dark)}
-            className="bg-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-600"
+            className="bg-gray-700 px-3 py-1 rounded text-sm"
           >
             {dark ? "☀ Light" : "🌙 Dark"}
           </button>
 
-          {/* LOGOUT */}
-
           <button
             onClick={handleLogout}
-            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 px-4 py-2 rounded"
           >
             Logout
           </button>
@@ -121,12 +73,12 @@ function Layout({ children }) {
       </header>
 
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-x-hidden">
 
         {/* SIDEBAR */}
 
         <aside
-          className={`bg-slate-900 dark:bg-gray-950 text-white w-64 p-5 space-y-6
+          className={`bg-slate-900 text-white w-64 p-5 space-y-6
           ${open ? "block" : "hidden"} md:block`}
         >
 
@@ -163,15 +115,9 @@ function Layout({ children }) {
 
         {/* CONTENT */}
 
-        <main className="flex-1 px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
+        <main className="flex-1 w-full px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
 
-          {/* FULL WIDTH CONTENT (NO SIDE GAPS) */}
-
-          <div className="w-full">
-
-            {children}
-
-          </div>
+          {children}
 
         </main>
 
