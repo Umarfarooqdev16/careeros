@@ -40,8 +40,12 @@ setTimeout(()=>setMessage(""),3000);
 
 }catch(err){
 
-if(err.response && err.response.data.message){
-setError(err.response.data.message);
+const backendMessage =
+err?.response?.data?.message ||
+err?.response?.data?.error;
+
+if(backendMessage){
+setError(backendMessage);
 }else{
 setError("Failed to create goal");
 }
