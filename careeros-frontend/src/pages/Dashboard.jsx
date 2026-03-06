@@ -22,7 +22,7 @@ const [badges,setBadges] = useState([]);
 const [showBadge,setShowBadge] = useState(null);
 const [notifications, setNotifications] = useState([]);
 
-/* NEW STATE FOR PLAN USAGE */
+/* PLAN USAGE STATE */
 const [usage,setUsage] = useState({
 used:0,
 limit:5
@@ -34,7 +34,6 @@ const fetchGoals = async () => {
 
     const res = await api.get("/goals");
 
-    /* SUPPORT BOTH OLD + NEW BACKEND RESPONSE */
     if(Array.isArray(res.data)){
       setGoals(res.data);
 
@@ -67,10 +66,8 @@ fetchGoals();
 const addNotification = (message) => {
 
 setNotifications(prev => [
-
 { message, time: new Date() },
 ...prev
-
 ]);
 
 };
@@ -107,10 +104,8 @@ setBadges(prev => [...prev,...newBadges]);
 const logActivity = (text) => {
 
 setActivity(prev => [
-
 {message:text,time:new Date()},
 ...prev
-
 ]);
 
 };
@@ -188,6 +183,36 @@ Free Plan Usage: {usage.used} / {usage.limit} Goals
 </span>
 
 </div>
+
+
+{/* UPGRADE BANNER */}
+{usage.limit && usage.used >= usage.limit && (
+
+<div className="bg-purple-100 border border-purple-300 p-4 rounded mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+<div>
+
+<h3 className="font-bold text-purple-800">
+🚀 Upgrade to Pro
+</h3>
+
+<p className="text-sm text-purple-700">
+You've reached your free plan limit. Upgrade to create unlimited goals.
+</p>
+
+</div>
+
+<button
+onClick={() => window.location.href="/pricing"}
+className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+>
+Upgrade Now
+</button>
+
+</div>
+
+)}
+
 
 {showBadge && (
 
