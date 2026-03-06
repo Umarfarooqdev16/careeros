@@ -1,119 +1,163 @@
 const db = require("../config/db");
 
-// Create Goal (with Free vs Pro limit)
+/* ===============================
+   CREATE GOAL
+================================ */
+
 exports.createGoal = (req, res) => {
-  const { title, description } = req.body;
-  const userId = req.user.id;
-  const userPlan = req.user.plan;
 
-  if (!title) {
-    return res.status(400).json({ message: "Title is required" });
-  }
+const { title, description } = req.body;
+const userId = req.user.id;
+const userPlan = req.user.plan;
 
-  const checkSql = "SELECT COUNT(*) as count FROM goals WHERE user_id = ?";
+if (!title) {
+return res.status(400).json({ message: "Title is required" });
+}
 
-  db.query(checkSql, [userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Error checking goal limit" });
-    }
+const checkSql = "SELECT COUNT(*) as count FROM goals WHERE user_id = ?";
 
-    const goalCount = results[0].count;
+db.query(checkSql, [userId], (err, results) => {
 
-    if (userPlan === "free" && goalCount >= 3) {
-      return res.status(403).json({
-        message: "Free plan limit reached. Upgrade to Pro for unlimited goals."
-      });
-    }
+if (err) {
+return res.status(500).json({ message: "Error checking goal limit" });
+}
 
-    const insertSql = "INSERT INTO goals (user_id, title, description) VALUES (?, ?, ?)";
+const goalCount = results[0].count;
 
-    db.query(insertSql, [userId, title, description], (err, result) => {
-      if (err) {
-        return res.status(500).json({ message: "Error creating goal" });
-      }
+if (userPlan === "free" && goalCount >= 3) {
+return res.status(403).json({
+message: "Free plan limit reached. Upgrade to Pro for unlimited goals."
+});
+}
 
-      res.status(201).json({ message: "Goal created successfully" });
-    });
-  });
+const insertSql =
+"INSERT INTO goals (user_id, title, description, progress) VALUES (?, ?, ?, 0)";
+
+db.query(insertSql, [userId, title, description], (err, result) => {
+
+if (err) {
+return res.status(500).json({ message: "Error creating goal" });
+}
+
+res.status(201).json({
+message: "Goal created successfully",
+goalId: result.insertId
+});
+
+});
+
+});
+
 };
 
-// Get User Goals
+
+
+/* ===============================
+   GET USER GOALS
+================================ */
+
 exports.getGoals = (req, res) => {
-  const userId = req.user.id;
 
-  const sql = "SELECT * FROM goals WHERE user_id = ?";
+const userId = req.user.id;
 
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Error fetching goals" });
-    }
+const sql = "SELECT * FROM goals WHERE user_id = ?";
 
-    res.json(results);
-  });
+db.query(sql, [userId], (err, results) => {
+
+if (err) {
+return res.status(500).json({ message: "Error fetching goals" });
+}
+
+/* Convert MySQL id → _id for React */
+const goals = results.map(goal => ({
+...goal,
+_id: goal.id
+}));
+
+res.json(goals);
+
+});
+
 };
 
-// Delete Goal
+
+
+/* ===============================
+   DELETE GOAL
+================================ */
+
 exports.deleteGoal = (req, res) => {
-  const goalId = req.params.id;
-  const userId = req.user.id;
 
-  const sql = "DELETE FROM goals WHERE id = ? AND user_id = ?";
+const goalId = req.params.id;
+const userId = req.user.id;
 
-  db.query(sql, [goalId, userId], (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Error deleting goal" });
-    }
+const sql = "DELETE FROM goals WHERE id = ? AND user_id = ?";
 
-    res.json({ message: "Goal deleted successfully" });
-  });
-};
+db.query(sql, [goalId, userId], (err, result) => {
 
+if (err) {
+return res.status(500).json({ message: "Error deleting goal" });
+}
 
-// Update Goal Progress
-exports.updateGoal = (req, res) => {
+if (result.affectedRows === 0) {
+return res.status(404).json({ message: "Goal not found" });
+}
 
-  const goalId = req.params.id;
-  const { progress } = req.body;
-  const userId = req.user.id;
+res.json({ message: "Goal deleted successfully" });
 
-  const safeProgress = Math.max(0, Math.min(100, progress));
-
-  const sql = "UPDATE goals SET progress = ? WHERE id = ? AND user_id = ?";
-
-  db.query(sql, [safeProgress, goalId, userId], (err, result) => {
-
-    if (err) {
-      console.error("Update error:", err);
-      return res.status(500).json({ message: "Error updating goal" });
-    }
-
-    res.json({ message: "Goal updated successfully" });
-
-  });
+});
 
 };
+
+
+
+/* ===============================
+   UPDATE GOAL
+   (progress + edit together)
+================================ */
 
 exports.updateGoal = (req, res) => {
 
 const goalId = req.params.id;
 const userId = req.user.id;
 
-const { title, description, deadline } = req.body;
+const {
+title,
+description,
+deadline,
+progress
+} = req.body;
+
+/* clamp progress between 0 and 100 */
+const safeProgress =
+progress !== undefined
+? Math.max(0, Math.min(100, progress))
+: null;
 
 const sql = `
-UPDATE goals 
-SET title = ?, description = ?, deadline = ?
+UPDATE goals
+SET
+title = COALESCE(?, title),
+description = COALESCE(?, description),
+deadline = COALESCE(?, deadline),
+progress = COALESCE(?, progress)
 WHERE id = ? AND user_id = ?
 `;
 
-db.query(sql, [title, description, deadline, goalId, userId], (err,result)=>{
+db.query(
+sql,
+[title, description, deadline, safeProgress, goalId, userId],
+(err, result) => {
 
-if(err){
-return res.status(500).json({message:"Error updating goal"});
+if (err) {
+console.error("Update error:", err);
+return res.status(500).json({ message: "Error updating goal" });
 }
 
-res.json({message:"Goal updated successfully"});
+res.json({ message: "Goal updated successfully" });
 
-});
+}
+
+);
 
 };
