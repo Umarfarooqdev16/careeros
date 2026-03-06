@@ -23,11 +23,9 @@ function Layout({ children }) {
   };
 
   return (
-
-    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 dark:bg-gray-900 flex flex-col">
 
       {/* HEADER */}
-
       <header className="bg-slate-900 text-white flex items-center justify-between px-4 py-3">
 
         <div className="flex items-center gap-3">
@@ -73,12 +71,12 @@ function Layout({ children }) {
       </header>
 
 
-      <div className="flex flex-1 overflow-x-hidden">
+      {/* MAIN AREA */}
+      <div className="flex flex-1 w-full overflow-x-hidden">
 
         {/* SIDEBAR */}
-
         <aside
-          className={`bg-slate-900 text-white w-64 p-5 space-y-6
+          className={`bg-slate-900 text-white w-64 p-5 space-y-6 flex-shrink-0
           ${open ? "block" : "hidden"} md:block`}
         >
 
@@ -113,9 +111,8 @@ function Layout({ children }) {
         </aside>
 
 
-        {/* CONTENT */}
-
-        <main className="flex-1 w-full px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
+        {/* PAGE CONTENT */}
+        <main className="flex-1 w-full overflow-x-hidden px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
 
           {children}
 
@@ -124,9 +121,7 @@ function Layout({ children }) {
       </div>
 
     </div>
-
   );
-
 }
 
 export default Layout;
