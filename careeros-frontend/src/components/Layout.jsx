@@ -7,6 +7,8 @@ function Layout({ children }) {
   const [dark, setDark] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const [notifications] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +25,7 @@ function Layout({ children }) {
   };
 
   return (
+
     <div className="min-h-screen w-full overflow-x-hidden bg-gray-100 dark:bg-gray-900 flex flex-col">
 
       {/* HEADER */}
@@ -45,13 +48,41 @@ function Layout({ children }) {
 
         <div className="flex items-center gap-2">
 
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="bg-gray-700 px-3 py-2 rounded"
-          >
-            🔔
-          </button>
+          {/* NOTIFICATIONS */}
+          <div className="relative">
 
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="bg-gray-700 px-3 py-2 rounded hover:bg-gray-600"
+            >
+              🔔
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3 z-50">
+
+                <p className="font-semibold mb-2">
+                  Notifications
+                </p>
+
+                {notifications.length === 0 ? (
+                  <p className="text-sm text-gray-500">
+                    No notifications
+                  </p>
+                ) : (
+                  notifications.map((n, i) => (
+                    <p key={i} className="text-sm mb-1">
+                      {n.message}
+                    </p>
+                  ))
+                )}
+
+              </div>
+            )}
+
+          </div>
+
+          {/* DARK MODE */}
           <button
             onClick={() => setDark(!dark)}
             className="bg-gray-700 px-3 py-1 rounded text-sm"
@@ -59,6 +90,7 @@ function Layout({ children }) {
             {dark ? "☀ Light" : "🌙 Dark"}
           </button>
 
+          {/* LOGOUT */}
           <button
             onClick={handleLogout}
             className="bg-red-500 px-4 py-2 rounded"
@@ -111,7 +143,7 @@ function Layout({ children }) {
         </aside>
 
 
-        {/* PAGE CONTENT */}
+        {/* CONTENT */}
         <main className="flex-1 w-full overflow-x-hidden px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
 
           {children}
@@ -121,7 +153,9 @@ function Layout({ children }) {
       </div>
 
     </div>
+
   );
+
 }
 
 export default Layout;
