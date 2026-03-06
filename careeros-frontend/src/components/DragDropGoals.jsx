@@ -1,7 +1,7 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import GoalCard from "./GoalCard";
 
-function DragDropGoals({ goals = [], setGoals, updateProgress, deleteGoal }) {
+function DragDropGoals({ goals = [], setGoals, updateProgress, deleteGoal, fetchGoals }) {
 
 const handleDragEnd = (result) => {
 
@@ -28,8 +28,8 @@ return (
 {Array.isArray(goals) && goals.map((goal, index) => (
 
 <Draggable
-key={goal._id || index}
-draggableId={String(goal._id || index)}
+key={goal._id}
+draggableId={String(goal._id)}
 index={index}
 >
 
@@ -44,6 +44,7 @@ ref={provided.innerRef}
 goal={goal}
 updateProgress={updateProgress}
 deleteGoal={deleteGoal}
+fetchGoals={fetchGoals}
 />
 
 </div>
