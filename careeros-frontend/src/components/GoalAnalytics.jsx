@@ -62,6 +62,7 @@ backgroundColor: [
 const options = {
 
 responsive: true,
+maintainAspectRatio: false,
 
 plugins: {
 
@@ -81,41 +82,47 @@ text: "Goal Progress Overview"
 
 return (
 
-<div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-8">
+<div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow mb-8">
 
-<h2 className="text-xl font-semibold mb-4">
+<h2 className="text-lg md:text-xl font-semibold mb-4">
 Progress Analytics
 </h2>
 
+
 {/* STAT CARDS */}
 
-<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-center">
 <p className="text-sm">Total Goals</p>
-<h2 className="text-2xl font-bold">{totalGoals}</h2>
+<h2 className="text-xl md:text-2xl font-bold">{totalGoals}</h2>
 </div>
 
 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-center">
 <p className="text-sm">Completed</p>
-<h2 className="text-2xl font-bold">{completed}</h2>
+<h2 className="text-xl md:text-2xl font-bold">{completed}</h2>
 </div>
 
 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-center">
 <p className="text-sm">In Progress</p>
-<h2 className="text-2xl font-bold">{inProgress}</h2>
+<h2 className="text-xl md:text-2xl font-bold">{inProgress}</h2>
 </div>
 
 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-center">
 <p className="text-sm">Completion Rate</p>
-<h2 className="text-2xl font-bold">{completionRate}%</h2>
+<h2 className="text-xl md:text-2xl font-bold">{completionRate}%</h2>
 </div>
 
 </div>
+
 
 {/* CHART */}
 
+<div className="w-full h-[250px] md:h-[300px]">
+
 <Bar data={data} options={options} />
+
+</div>
 
 </div>
 

@@ -34,7 +34,7 @@ function Layout({ children }) {
 
       {/* HEADER */}
 
-      <header className="bg-slate-900 dark:bg-gray-950 text-white flex items-center justify-between px-4 py-3">
+      <header className="bg-slate-900 dark:bg-gray-950 text-white flex flex-wrap items-center justify-between px-4 py-3 gap-2">
 
         <div className="flex items-center gap-3">
 
@@ -53,9 +53,9 @@ function Layout({ children }) {
 
         {/* RIGHT SIDE BUTTONS */}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
 
-          {/* NOTIFICATION BELL */}
+          {/* NOTIFICATIONS */}
 
           <div className="relative">
 
@@ -68,7 +68,7 @@ function Layout({ children }) {
 
             {showNotifications && (
 
-              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3">
+              <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow-lg p-3 z-50">
 
                 <p className="font-semibold mb-2">
                   Notifications
@@ -121,20 +121,26 @@ function Layout({ children }) {
       </header>
 
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 relative">
 
         {/* SIDEBAR */}
 
         <aside
-          className={`bg-slate-900 dark:bg-gray-950 text-white w-64 p-5 space-y-6
-          ${open ? "block" : "hidden"} md:block`}
+          className={`
+          bg-slate-900 dark:bg-gray-950 text-white w-64 p-5 space-y-6
+          fixed md:static top-0 left-0 h-full z-40
+          transform transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+          `}
         >
 
-          <nav className="space-y-4">
+          <nav className="space-y-4 mt-10 md:mt-0">
 
             <Link
               to="/dashboard"
               className="block hover:text-blue-300"
+              onClick={() => setOpen(false)}
             >
               Dashboard
             </Link>
@@ -142,6 +148,7 @@ function Layout({ children }) {
             <Link
               to="/analytics"
               className="block hover:text-blue-300"
+              onClick={() => setOpen(false)}
             >
               Analytics
             </Link>
@@ -149,6 +156,7 @@ function Layout({ children }) {
             <Link
               to="/profile"
               className="block hover:text-blue-300"
+              onClick={() => setOpen(false)}
             >
               Profile
             </Link>
@@ -158,11 +166,15 @@ function Layout({ children }) {
         </aside>
 
 
-        {/* CONTENT */}
+        {/* PAGE CONTENT */}
 
-        <main className="flex-1 px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
+        <main className="flex-1 w-full px-4 py-6 md:p-6 text-gray-800 dark:text-gray-200">
 
-          {children}
+          <div className="max-w-7xl mx-auto">
+
+            {children}
+
+          </div>
 
         </main>
 

@@ -31,8 +31,6 @@ const fetchGoals = async () => {
 
     const res = await api.get("/goals");
 
-    console.log("Goals from backend:", res.data);   // 👈 ADD THIS LINE
-
     setGoals(Array.isArray(res.data) ? res.data : []);
 
   }catch(err){
@@ -46,6 +44,7 @@ const fetchGoals = async () => {
 useEffect(()=>{
 fetchGoals();
 },[]);
+
 
 const addNotification = (message) => {
 
@@ -179,6 +178,8 @@ return(
 
 <Layout>
 
+<div className="px-4 md:px-6">
+
 {/* BADGE POPUP */}
 
 {showBadge && (
@@ -198,7 +199,10 @@ Dismiss
 
 )}
 
-<div className="flex items-center justify-between mb-6">
+
+{/* HEADER */}
+
+<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-2">
 
 <h1 className="text-3xl font-bold">
 Dashboard
@@ -213,8 +217,10 @@ Track your career progress 🚀
 
 {/* PRODUCTIVITY STREAK */}
 
-<div className="bg-orange-100 p-4 rounded mb-6 text-lg font-semibold">
+<div className="bg-orange-100 p-3 md:p-4 rounded mb-6 text-base md:text-lg font-semibold">
+
 🔥 Productivity Streak: {streak} goals completed
+
 </div>
 
 
@@ -307,6 +313,7 @@ fetchGoals={fetchGoals}
 
 <GoalActivityLog activity={activity} />
 
+</div>
 
 </Layout>
 
